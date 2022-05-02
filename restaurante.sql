@@ -204,6 +204,31 @@ BEGIN
 END;
 $$
 ---------------------------------------------------------------------------------------------------
+--inserção de múltiplos clientes com VARIADIC
+CREATE OR REPLACE PROCEDURE sp_cadastrar_clientes (OUT resultado TEXT, VARIADIC nomes TEXT[])
+LANGUAGE plpgsql
+AS $$
+DECLARE
+	nome TEXT;
+BEGIN
+	resultado := 'Clientes cadastrados: ';
+	FOREACH nome IN ARRAY nomes LOOP
+		INSERT INTO tb_cliente (nome) VALUES (nome);
+		resultado := CONCAT (resultado, nome, ' ');
+	END LOOP;
+END;
+$$
+
+DO
+$$
+DECLARE
+	resultado TEXT;
+BEGIN
+	CALL sp_cadastrar_clientes (resultado, 'João', 'Maria');
+	RAISE NOTICE '%', resultado;
+END;
+$$
+---------------------------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------------------------
 DROP TABLE tb_cliente;
